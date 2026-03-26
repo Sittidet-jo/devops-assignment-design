@@ -1,0 +1,69 @@
+{
+  "name": "learn-jenkins-app",
+  "version": "2.3.2",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "jest-junit": "^16.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "^5.0.1",
+    "web-vitals": "^2.1.4",
+    "express": "^4.18.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "start:server": "node server.js",
+    "build": "react-scripts build",
+    "test": "react-scripts test --testResultsProcessor=\"jest-junit\"",
+    "eject": "react-scripts eject",
+    "lint": "eslint . --ext .js"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.39.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/gitlab": "^13.2.9",
+    "@semantic-release/npm": "^12.0.2",
+    "@semantic-release/release-notes-generator": "^14.1.0",
+    "@types/body-parser": "^1.19.6",
+    "@types/node": "^20.8.6",
+    "conventional-changelog-conventionalcommits": "^9.1.0",
+    "eslint": "^8.57.1",
+    "jest": "^27.5.1",
+    "semantic-release": "^24.2.9",
+    "snyk": "^1.1296.2"
+  },
+  "jest-junit": {
+    "suiteName": "jest tests",
+    "outputDirectory": "test-results",
+    "outputName": "junit.xml",
+    "uniqueOutputName": "false",
+    "classNameTemplate": "{classname}-{title}",
+    "titleTemplate": "{classname}-{title}",
+    "ancestorSeparator": " › ",
+    "usePathForSuiteName": "true"
+  }
+}
