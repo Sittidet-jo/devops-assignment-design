@@ -1,0 +1,83 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: test-fe-deployment
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+        - name: pull-secret
+      containers:
+        - name: test-fe
+          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.4
+          env:
+            - name: HOSTNAME
+              value: "0.0.0.0"
+            - name: PORT
+              value: "8080"
+
+          ports:
+            - name: http
+              containerPort: 8080
+
+
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+
+
+
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: test-fe-deployment
+spec:
+  replicas: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-fe-service-stable
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 30005
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-fe-service-canary
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 30105
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: test-fe-deployment
+spec:
+
+  strategy:
+    canary:
+      stableService: test-fe-service-stable
+      canaryService: test-fe-service-canary
+      steps:
+        - setWeight: 25
+        - pause: { duration: 15s }
+        - setWeight: 50
+        - pause: {}
+        - setWeight: 100
+

@@ -2,3 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ../../../base/app
+images:
+  - name: test-fe
+    newName: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd
+    newTag: 1.0.4
+nameSuffix: -prd
+namespace: default
+patches:
+  - path: patch-overrides.yaml
