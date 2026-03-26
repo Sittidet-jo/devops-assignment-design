@@ -1,0 +1,33 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: test-be-api-smoke-test-task
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: test-be-api-smoke-test-task
+              image: registry.gitlab.com/sittidet.jo/devops-assignment-test/poc:1.0.2
+              env:
+                - name: BASE_URL
+                  value: "http://test-python-backend-api-service-stable-prd:10104"
+
+              volumeMounts:
+                - name: config-volume
+                  mountPath: /app/config.yaml
+                  subPath: config.yaml
+              resources:
+                requests:
+                  cpu: 350m
+                  memory: 256Mi
+                limits:
+                  cpu: 750m
+                  memory: 512Mi
+
+          volumes:
+            - name: config-volume
+              secret:
+                secretName: test-config-api
