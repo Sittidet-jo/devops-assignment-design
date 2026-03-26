@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: test-be-api-deployment
+spec:
+  revisionHistoryLimit: 2
+  replicas: 3
+  selector:
+    matchLabels:
+      app: test-be-api
+
+  template:
+    metadata:
+      labels:
+        app: test-be-api
+    spec:
+      imagePullSecrets:
+        - name: test-pull-secret
+      containers:
+        - name: test-be-api
+          image: test-be-api:PLACEHOLDER_TAG
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 10104
+
+  strategy:
+    canary:
+      stableService: test-be-api-service-stable
+      canaryService: test-be-api-service-canary
+      steps:
+        - setWeight: 25
+        - pause: { duration: 15s }
+        - setWeight: 50
+        - pause: { duration: 15s }
+        - setWeight: 100

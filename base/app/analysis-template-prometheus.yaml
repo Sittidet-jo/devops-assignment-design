@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: test-be-api-analysis-prometheus
+spec:
+  args:
+    - name: namespace
+      value: default
+    - name: podRegex
+      value: "test-be-api-.*"
+    - name: prom_interval
+      value: "1m"
+
+  metrics:
+    - name: error-rate
+      interval: 30s
+      count: 3
+      failureLimit: 1
+      provider:
+        prometheus:
+          address: "http://192.168.57.11:9090"
+          query: |
+            sum(rate(http_requests_total{
+              namespace="{{args.namespace}}",
+              pod=~"{{args.podRegex}}",
+              status=~"5.*"
+            }[1m])) 
+            / 
+            sum(rate(http_requests_total{
+              namespace="{{args.namespace}}",
+              pod=~"{{args.podRegex}}"
+            }[1m]))
+      successCondition: len(result) == 0 || result[0] != result[0] || result[0] < 0.01
+
+    - name: restarts
+      interval: 30s
+      count: 3
+      failureLimit: 1
+      provider:
+        prometheus:
+          address: "http://192.168.57.11:9090"
+          query: |
+            sum(increase(kube_pod_container_status_restarts_total{
+              namespace="{{args.namespace}}",
+              pod=~"{{args.podRegex}}"
+            }[1m]))
+      successCondition: result[0] <= 1

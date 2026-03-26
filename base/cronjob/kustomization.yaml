@@ -1,0 +1,2 @@
+resources:
+  - cronjob-test-be-api-smoke-test-task.yaml

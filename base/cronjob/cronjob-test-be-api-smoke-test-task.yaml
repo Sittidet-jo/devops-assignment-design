@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: test-be-api-smoke-test-task
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+            - name: test-pull-secret
+          containers:
+            - name: test-be-api-smoke-test-task
+              image: test-be-api:PLACEHOLDER_TAG
+              imagePullPolicy: Always
+              command: ["python","scripts/cronjob_smoke_test.py"]
+          restartPolicy: OnFailure

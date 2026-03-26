@@ -1,0 +1,10 @@
+resources:
+  - rollout.yaml
+  - service-stable.yaml
+  - service-canary.yaml
+  - analysis-template-newman.yaml
+  - analysis-template-prometheus.yaml
+  - rbac-analysis-job.yaml
+  - vpa.yaml
+configurations:
+  - kustomize-config.yaml
