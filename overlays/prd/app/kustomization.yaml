@@ -1,13 +1,17 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../../base/app
-  - smoke-test-configmap.yaml
+- ../../../base/app
+- smoke-test-configmap.yaml
 images:
-  - name: test-be-api
-    newName: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd
-    newTag: 1.0.5
+- name: test-be-api
+  newName: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd
+  newTag: 1.0.5
 nameSuffix: -prd
 namespace: default
 patches:
-  - path: patch-overrides.yaml
+- path: remove-replicas.yaml
+  target:
+    kind: Rollout
+- path: patch-overrides.yaml
+- path: patch-scaledobject-ref.yaml
