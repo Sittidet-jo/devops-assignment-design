@@ -1,7 +1,8 @@
 /*frontend-sample-app*/
 /* groovylint-disable-next-line UnusedVariable */
-@Library('my-devops-library@feat/newman') _
+@Library('devops-assignment-test@jenkins-shared-library') _
 
+def projectZoneName ='Devops-Assignment'
 def appName = 'test-jenkins-app'
 def prometheusHostUrl = env.PROMETHEUS_HOST_URL
 
@@ -9,26 +10,27 @@ def cfg = [
   projectName : appName,
   language    : 'javascript',
   projectType : 'frontend',
-  imageEnv    : 'dev',
+  imageEnv    : 'prd',
 
-  ci: [
-    forceRebuild: 'No',
-    deployRegistry: 'gitlab',
-    deployStrategy: 'canary',
-    autoSync: 'Yes',
-    kubeHealthCheck: 'Yes',
-    analysis: 'Yes',
-    autoScaling: 'keda',
-    dastScan: 'No'
-  ],
+  ci: [                                                                                                                                                             
+    pipelineMode: 'build-deploy-app',                                                                                                                               
+    forceRebuild: 'No',                                                                                                                                             
+    deployRegistry: 'gitlab',                                                                                                                                       
+    autoSync: 'No',                                                                                                                                                 
+    deployStrategy: 'canary',                                                                                                                                       
+    kubeHealthCheck: 'No',                                                                                                                                          
+    analysis: 'No',                                                                                                                                                 
+    autoScaling: 'vpa',                                                                                                                                             
+    dastScan: 'No',                                                                                                                                                                                                                                                                                           
+  ], 
 
-  gitlab: [
-    baseUrl      : 'https://skywalker.inet.co.th',
-    registryHost : 'skywalker.inet.co.th:5050',
-    sourcePath   : 'devops/test-jenkins-app',
-    manifestPath : 'devops/test-jenkins-app',
-    sourceBranch : 'main'
-  ],
+  gitlab: [                                                                                                                                                         
+    baseUrl      : 'https://gitlab.com',                                                                                                                  
+    registryHost : 'registry.gitlab.com',                                                                                                                     
+    sourcePath   : 'sittidet.jo/devops-assignment-test',                                                                                                                
+    manifestPath : 'sittidet.jo/devops-assignment-test',                                                                                                                
+    sourceBranch : 'test-jenkins-app'                                                                                                                                           
+  ],  
 
   deployment: [
     namespace       : 'default',
@@ -170,13 +172,13 @@ def cfg = [
     dockerfilePath  : '.',
   ],
 
-  credentials: [
-    gitlab       : 'GITLAB_CREDENTIALS',
-    gitlab_text  : 'GITLAB_PAT_CREDENTIALS',
-    scm          : 'GITLAB_CREDENTIALS',
-    frontend_env : 'FRONTEND_ENV',
-    argocd       : 'ARGOCD_CREDENTIALS'
-  ],
+  credentials: [                                                                                                                                                    
+    gitlab       : 'GITLAB_CREDENTIALS_TEST',                                                                                                                            
+    gitlab_text  : 'GITLAB_PAT_CREDENTIALS_TEST',                                                                                                                        
+    scm          : 'GITLAB_CREDENTIALS',                                                                                                                            
+    backend_env  : 'BACKEND_ENV',                                                                                                                                   
+    argocd       : 'ARGOCD_CREDENTIALS'                                                                                                                             
+  ],  
 
   env: [
     IMAGE_REGISTRY      : env.IMAGE_REGISTRY,
