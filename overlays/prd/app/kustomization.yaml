@@ -6,8 +6,11 @@ resources:
 images:
   - name: test-be-api
     newName: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd
-    newTag: 1.0.3
+    newTag: 1.0.4
 nameSuffix: -prd
 namespace: default
 patches:
+  - path: remove-replicas.yaml
+    target:
+      kind: Rollout
   - path: patch-overrides.yaml
