@@ -5,6 +5,6 @@ resources:
   - analysis-template-newman.yaml
   - analysis-template-prometheus.yaml
   - rbac-analysis-job.yaml
-  - scaledobject.yaml
+  - vpa.yaml
 configurations:
   - kustomize-config.yaml
