@@ -1,0 +1,8 @@
+# .dockerignore
+venv/
+.git/
+__pycache__/
+*.pyc
+.scannerwork/
+coverage.xml
+test-report.xml
