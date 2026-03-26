@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: test-fe-deployment
+spec:
+  revisionHistoryLimit: 2
+  replicas: 3
+  selector:
+    matchLabels:
+      app: test-fe
+
+  template:
+    metadata:
+      labels:
+        app: test-fe
+    spec:
+      imagePullSecrets:
+        - name: pull-secret
+      containers:
+        - name: test-fe
+          image: test-fe:PLACEHOLDER_TAG
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+
+  strategy:
+    canary:
+      stableService: test-fe-service-stable
+      canaryService: test-fe-service-canary
+      steps:
+        - setWeight: 25
+        - pause: { duration: 15s }
+        - setWeight: 50
+        - pause: {}
+        - setWeight: 100
