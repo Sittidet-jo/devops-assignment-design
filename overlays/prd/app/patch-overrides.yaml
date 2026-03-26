@@ -1,0 +1,86 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: test-be-api-deployment
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+        - name: test-pull-secret
+      containers:
+        - name: test-be-api
+          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.0
+
+          ports:
+            - name: http
+              containerPort: 10104
+
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+
+          resources:
+            requests:
+              cpu: 350m
+              memory: 256Mi
+            limits:
+              cpu: 750m
+              memory: 512Mi
+
+
+
+
+      volumes:
+        - name: config-volume
+          secret:
+            secretName: test-config-api
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: test-be-api-deployment
+spec:
+  replicas: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-be-api-service-stable
+spec:
+  ports:
+    - name: http
+      port: 10104
+      targetPort: 10104
+      nodePort: 30021
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-be-api-service-canary
+spec:
+  ports:
+    - name: http
+      port: 10104
+      targetPort: 10104
+      nodePort: 30121
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: test-be-api-deployment
+spec:
+
+  strategy:
+    canary:
+      stableService: test-be-api-service-stable
+      canaryService: test-be-api-service-canary
+      steps:
+        - setWeight: 25
+        - pause: { duration: 15s }
+        - setWeight: 50
+        - pause: { duration: 15s }
+        - setWeight: 100
+
