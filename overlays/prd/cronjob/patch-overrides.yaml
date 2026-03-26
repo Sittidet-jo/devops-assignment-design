@@ -19,9 +19,6 @@ spec:
                 - name: config-volume
                   mountPath: /app/config.yaml
                   subPath: config.yaml
-                - name: logs-storage
-                  mountPath: /app/logs
-                  subPath: logs
               resources:
                 requests:
                   cpu: 350m
@@ -34,6 +31,3 @@ spec:
             - name: config-volume
               secret:
                 secretName: test-config-api
-            - name: logs-storage
-              persistentVolumeClaim:
-                claimName: test-be-api-logs-pvc-prd
