@@ -1,8 +1,8 @@
 /*test-python-backend-api*/                                                                                                                                           
-/* groovylint-disable-next-line UnusedVariable */                                                                                                                   
-@Library('jenkins-shared-library@test-deploy') _                                                                                                              
-                                                                                                                                                                    
-def projectZoneName ='Test-API-Zone'                                                                                                                                
+/* groovylint-disable-next-line UnusedVariable */
+@Library('devops-assignment-test@jenkins-shared-library') _
+                                                                                                                                                                   
+def projectZoneName ='Devops-Assignment'                                                                                                                                
 def appName = 'test-be-api'                                                                                                                             
 def prometheusHostUrl = env.PROMETHEUS_HOST_URL                                                                                                                     
                                                                                                                                                                     
@@ -27,11 +27,11 @@ def cfg = [
   ],                                                                                                                                                                              
                                                                                                                                                                     
   gitlab: [                                                                                                                                                         
-    baseUrl      : 'https://skywalker.inet.co.th',                                                                                                                  
-    registryHost : 'skywalker.inet.co.th:5050',                                                                                                                     
-    sourcePath   : 'devops/test-python-backend-api',                                                                                                                
-    manifestPath : 'devops/test-python-backend-api',                                                                                                                
-    sourceBranch : 'main'                                                                                                                                           
+    baseUrl      : 'https://gitlab.com',                                                                                                                  
+    registryHost : 'registry.gitlab.com',                                                                                                                     
+    sourcePath   : 'sittidet.jo/devops-assignment-test',                                                                                                                
+    manifestPath : 'sittidet.jo/devops-assignment-test',                                                                                                                
+    sourceBranch : 'test-python-backend-api'                                                                                                                                           
   ],                                                                                                                                                                
                                                                                                                                                                     
   deployment: [                                                                                                                                                     
@@ -215,8 +215,8 @@ def cfg = [
   ],                                                                                                                                                                
                                                                                                                                                                     
   credentials: [                                                                                                                                                    
-    gitlab       : 'GITLAB_CREDENTIALS',                                                                                                                            
-    gitlab_text  : 'GITLAB_PAT_CREDENTIALS',                                                                                                                        
+    gitlab       : 'GITLAB_CREDENTIALS_TEST',                                                                                                                            
+    gitlab_text  : 'GITLAB_PAT_CREDENTIALS_TEST',                                                                                                                        
     scm          : 'GITLAB_CREDENTIALS',                                                                                                                            
     backend_env  : 'BACKEND_ENV',                                                                                                                                   
     argocd       : 'ARGOCD_CREDENTIALS'                                                                                                                             
@@ -230,4 +230,4 @@ def cfg = [
   ]                                                                                                                                                                 
 ]                                                                                                                                                                   
                                                                                                                                                                     
-generalPipeline(cfg)                        
+generalPipeline(cfg)
