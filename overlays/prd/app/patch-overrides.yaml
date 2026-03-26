@@ -9,7 +9,7 @@ spec:
         - name: pull-secret
       containers:
         - name: test-be-api
-          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.3
+          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.4
 
           ports:
             - name: http
@@ -31,29 +31,8 @@ spec:
               cpu: 750m
               memory: 512Mi
 
-          startupProbe:
-            httpGet:
-              path: /health
-              port: 10104
-            failureThreshold: 20
-            periodSeconds: 6
-            timeoutSeconds: 5
 
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 10104
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 5
 
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 10104
-            initialDelaySeconds: 30
-            periodSeconds: 20
-            timeoutSeconds: 5
 
       volumes:
         - name: config-volume
