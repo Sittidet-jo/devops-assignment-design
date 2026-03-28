@@ -9,7 +9,7 @@ spec:
         - name: pull-secret
       containers:
         - name: test-be-api
-          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.5
+          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.6
 
           ports:
             - name: http
@@ -120,7 +120,6 @@ spec:
         - analysis:
             templates:
               - templateName: test-be-api-analysis-newman
-              - templateName: test-be-api-analysis-prometheus
             args:
               - name: url
                 value: "http://test-be-api-service-canary-prd:10104"
