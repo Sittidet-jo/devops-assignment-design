@@ -44,4 +44,4 @@ spec:
               namespace="{{args.namespace}}",
               pod=~"{{args.podRegex}}"
             }[1m]))
-      successCondition: result[0] <= 1
+      successCondition: len(result) == 0 || result[0] <= 1
