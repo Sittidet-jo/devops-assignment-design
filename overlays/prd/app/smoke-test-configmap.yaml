@@ -211,7 +211,7 @@ data:
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"triggered_by\": \"Pittaya\",\n  \"message\": \"ลองเขียน Dataabse\"\n}",
+              "raw": "{\n  \"triggered_by\": \"Sittidet\",\n  \"message\": \"ลองเขียน Dataabse\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
