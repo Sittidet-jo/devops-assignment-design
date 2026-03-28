@@ -42,7 +42,6 @@ spec:
         - analysis:
             templates:
               - templateName: test-be-api-analysis-newman
-              - templateName: test-be-api-analysis-prometheus
             args:
               - name: url
                 value: ""
