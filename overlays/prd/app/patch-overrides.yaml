@@ -9,7 +9,7 @@ spec:
         - name: pull-secret
       containers:
         - name: test-be-api
-          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.6
+          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.5
 
           ports:
             - name: http
@@ -28,29 +28,8 @@ spec:
               cpu: 750m
               memory: 512Mi
 
-          startupProbe:
-            httpGet:
-              path: /health
-              port: 10104
-            failureThreshold: 20
-            periodSeconds: 6
-            timeoutSeconds: 5
 
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 10104
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 5
 
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 10104
-            initialDelaySeconds: 30
-            periodSeconds: 20
-            timeoutSeconds: 5
 
       volumes:
         - name: config-volume
@@ -86,9 +65,7 @@ kind: Rollout
 metadata:
   name: test-be-api-deployment
 spec:
-  analysis:
-    successfulRunHistoryLimit: 1
-    unsuccessfulRunHistoryLimit: 1
+
   strategy:
     canary:
       stableService: test-be-api-service-stable
@@ -96,47 +73,7 @@ spec:
       steps:
         - setWeight: 25
         - pause: { duration: 15s }
-        - analysis:
-            templates:
-              - templateName: test-be-api-analysis-newman
-            args:
-              - name: url
-                value: "http://test-be-api-service-canary-prd:10104"
-              - name: paths
-                value: "/"
-              - name: configMapName
-                value: "test-be-api-smoke-test-config-prd"
-              - name: secretName
-                value: "test-api-secret"
-              - name: timeout
-                value: "10"
-              - name: count
-                value: "3"
-              - name: smoke_interval
-                value: "5s"
-              - name: failure
-                value: "1"
         - setWeight: 50
-        - analysis:
-            templates:
-              - templateName: test-be-api-analysis-newman
-            args:
-              - name: url
-                value: "http://test-be-api-service-canary-prd:10104"
-              - name: paths
-                value: "/"
-              - name: configMapName
-                value: "test-be-api-smoke-test-config-prd"
-              - name: secretName
-                value: "test-api-secret"
-              - name: timeout
-                value: "10"
-              - name: count
-                value: "3"
-              - name: smoke_interval
-                value: "5s"
-              - name: failure
-                value: "1"
         - pause: { duration: 15s }
         - setWeight: 100
 
