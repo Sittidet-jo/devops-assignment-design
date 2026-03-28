@@ -10,7 +10,7 @@ spec:
         spec:
           containers:
             - name: test-be-api-smoke-test-task
-              image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.5
+              image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.2
               env:
                 - name: BASE_URL
                   value: "http://test-python-backend-api-service-stable-prd:10104"
