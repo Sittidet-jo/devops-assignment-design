@@ -9,7 +9,7 @@ spec:
         - name: pull-secret
       containers:
         - name: test-be-api
-          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.7
+          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.5
 
           ports:
             - name: http

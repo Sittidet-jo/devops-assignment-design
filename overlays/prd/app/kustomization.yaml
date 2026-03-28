@@ -6,7 +6,7 @@ resources:
 images:
 - name: test-be-api
   newName: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd
-  newTag: 1.0.7
+  newTag: 1.0.5
 nameSuffix: -prd
 namespace: default
 patches:
