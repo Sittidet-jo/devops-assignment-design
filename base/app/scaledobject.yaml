@@ -1,0 +1,22 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: test-fe-deployment-scaler
+spec:
+  scaleTargetRef:
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
+    name: test-fe-deployment
+  minReplicaCount: 2
+  maxReplicaCount: 6
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers:
+  - type: cpu
+    metricType: Utilization
+    metadata:
+      value: "75"
+  - type: memory
+    metricType: Utilization
+    metadata:
+      value: "75"

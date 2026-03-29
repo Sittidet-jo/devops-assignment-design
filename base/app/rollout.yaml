@@ -4,7 +4,7 @@ metadata:
   name: test-fe-deployment
 spec:
   revisionHistoryLimit: 2
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: test-fe
@@ -30,6 +30,22 @@ spec:
       steps:
         - setWeight: 25
         - pause: { duration: 15s }
+        - analysis:
+            templates:
+              - templateName: test-fe-analysis-prometheus
+            args:
+              - name: url
+                value: ""
+              - name: paths
+                value: "[GET|/]"
         - setWeight: 50
+        - analysis:
+            templates:
+              - templateName: test-fe-analysis-prometheus
+            args:
+              - name: url
+                value: ""
+              - name: paths
+                value: "[GET|/]"
         - pause: {}
         - setWeight: 100
