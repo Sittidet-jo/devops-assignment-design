@@ -1,0 +1,14 @@
+mongodb:
+  server: "172.30.11.11:27017,172.30.11.12:27017,172.30.11.13:27017"
+  username: "admin"
+  password: "adminadmin"
+  authsource: "admin"
+
+server:
+  name: "appblueprint"
+  public: "0.0.0.0"
+  port: 10104
+  secret_key: "test123456"
+
+security:
+  api_key: "secret-api-key-1234"
