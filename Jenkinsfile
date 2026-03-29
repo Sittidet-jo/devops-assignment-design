@@ -36,7 +36,7 @@ def cfg = [
     namespace       : 'default',
     containerPort   : 8080,
     targetPort      : 8080,
-    nodePort        : 30001,
+    nodePort        : 30005,
     imagePullSecret : 'test-pull-secret',
     envType         : 'none',
     env: [
