@@ -9,7 +9,7 @@ spec:
         - name: pull-secret
       containers:
         - name: test-fe
-          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:1.0.3
+          image: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd:2.0.0
           env:
             - name: HOSTNAME
               value: "0.0.0.0"

@@ -5,7 +5,7 @@ resources:
 images:
 - name: test-fe
   newName: registry.gitlab.com/sittidet.jo/devops-assignment-test/prd
-  newTag: 1.0.3
+  newTag: 2.0.0
 nameSuffix: -prd
 namespace: default
 patches:
