@@ -1,0 +1,56 @@
+services:
+  jenkins:
+    build:
+      context: .
+      args:
+        DOCKER_GID: "{{ docker_gid | default('999') }}"
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      # --- ข้อมูลหลักของ Jenkins ---
+      - jenkins_home:/var/jenkins_home
+      - ./jcasc:/var/jenkins_home/jcasc
+      
+      # --- เมาท์ Scripts ไปที่ Path มาตรฐานสำหรับเรียกใช้งาน ---
+      - ./resources/scripts:/opt/scripts
+      
+      # --- Socket สำหรับรัน Docker ใน Jenkins ---
+      - /var/run/docker.sock:/var/run/docker.sock
+      
+      # --- ระบบ Cache ---
+      - npm_cache:/shared-cache/npm
+      - yarn_cache:/shared-cache/yarn
+      - pip_cache:/shared-cache/pip
+      - trivy_cache:/shared-cache/trivy
+      - sonar_cache:/shared-cache/sonar
+
+    group_add:
+      - "{{ docker_gid | default('999') }}"
+    environment:
+      - CASC_JENKINS_CONFIG=/var/jenkins_home/jcasc/jenkins.yaml
+      - JAVA_OPTS=-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djenkins.install.runSetupWizard=false
+      - DOCKER_BUILDKIT=1
+      - COMPOSE_DOCKER_CLI_BUILD=1
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+
+volumes:
+  jenkins_home:
+  npm_cache:
+  yarn_cache:
+  pip_cache:
+  trivy_cache:
+  sonar_cache:

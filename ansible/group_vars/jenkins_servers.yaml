@@ -1,0 +1,34 @@
+# ansible/group_vars/jenkins_servers.yaml
+
+# --- 1. Connection Settings ---
+ansible_user: "username"
+ansible_ssh_private_key_file: "~/path/to/private_key.pem"
+ansible_become_password: "sudo_password"
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+
+# --- 2. Infrastructure Settings ---
+project_path: "/opt/jenkins-shared-library"
+docker_gid: 999 
+ansible_host: "IP"
+
+# --- 3. Jenkins Security ---
+jenkins_admin_password: "admin_password"
+
+# --- 4. Service URLs ---
+argocd_url: "IP:30642"
+prometheus_url: "http://IP:9090"
+jenkins_url: "http://{{ ansible_host }}:8080"
+
+# --- 5. Integration Settings ---
+gitlab_url: "https://xxxxxx"
+shared_library_repo_url: "https://xxxxxx/jenkins-shared-library.git"
+
+# --- 6. Credentials & Tokens ---
+gitlab_username: "sittidet.jo"
+gitlab_pat: "glpat-xxxxxx"
+gitlab_token: "glpat-xxxxx"
+
+argocd_username: "admin"
+argocd_password: "xxxx"
+
+discord_webhook_url: "https://discord.com/api/webhooks/xxx"

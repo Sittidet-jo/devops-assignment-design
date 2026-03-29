@@ -1,0 +1,9 @@
+---
+- name: Setup Jenkins Server
+  hosts: jenkins_servers
+  become: true
+  
+  roles:
+    - base
+    - docker
+    - jenkins

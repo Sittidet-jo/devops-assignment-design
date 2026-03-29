@@ -1,0 +1,27 @@
+nameReference:
+- kind: Service
+  version: v1
+  fieldSpecs:
+  - path: spec/strategy/canary/stableService
+    kind: Rollout
+  - path: spec/strategy/canary/canaryService
+    kind: Rollout
+  - path: spec/strategy/blueGreen/activeService
+    kind: Rollout
+  - path: spec/strategy/blueGreen/previewService
+    kind: Rollout
+
+- kind: AnalysisTemplate
+  group: argoproj.io
+  version: v1alpha1
+  fieldSpecs:
+  - path: spec/strategy/canary/steps/analysis/templates/templateName
+    kind: Rollout
+  - path: spec/strategy/canary/steps/analysis/templateName
+    kind: Rollout
+
+images:
+- kind: Rollout
+  path: spec/template/spec/containers/image
+- kind: CronJob
+  path: spec/jobTemplate/spec/template/spec/containers/image

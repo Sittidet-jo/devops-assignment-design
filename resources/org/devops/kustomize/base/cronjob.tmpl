@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{CRON_NAME}}
+spec:
+  schedule: "{{SCHEDULE}}"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+            - name: {{IMAGE_PULL}}
+          containers:
+            - name: {{CRON_NAME}}
+              image: {{APP_NAME}}:PLACEHOLDER_TAG
+              imagePullPolicy: Always
+              command: {{COMMAND}}
+          restartPolicy: OnFailure

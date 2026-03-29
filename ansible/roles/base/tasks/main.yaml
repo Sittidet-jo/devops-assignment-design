@@ -1,0 +1,53 @@
+---
+- name: Remove broken Docker repository (to allow apt update to proceed)
+  file:
+    path: /etc/apt/sources.list.d/docker.list
+    state: absent
+  when: ansible_os_family == "Debian"
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Install base system packages
+  package:
+    name:
+      - curl
+      - git
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - python3-pip
+      - dnsutils
+    state: present
+
+- name: Configure systemd-resolved for Hybrid DNS (Internal + Google)
+  lineinfile:
+    path: /etc/systemd/resolved.conf
+    regexp: '^#?DNS='
+    line: "DNS={{ (internal_dns_servers + public_dns_servers) | join(' ') }}"
+  register: resolved_config
+  when: ansible_os_family == "Debian"
+
+- name: Configure systemd-resolved to use Fallback DNS
+  lineinfile:
+    path: /etc/systemd/resolved.conf
+    regexp: '^#?FallbackDNS='
+    line: 'FallbackDNS=1.1.1.1 1.0.0.1'
+  register: fallback_config
+  when: ansible_os_family == "Debian"
+
+- name: Ensure /etc/resolv.conf is symlinked to systemd-resolved stub
+  file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: yes
+  when: ansible_os_family == "Debian"
+
+- name: Restart systemd-resolved
+  systemd:
+    name: systemd-resolved
+    state: restarted
+  when: ansible_os_family == "Debian"

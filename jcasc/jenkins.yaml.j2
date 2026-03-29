@@ -1,0 +1,80 @@
+jenkins:
+  systemMessage: "Jenkins configured via Ansible & JCasC"
+  numExecutors: 2
+  mode: NORMAL
+  scmCheckoutRetryCount: 3
+  labelString: "built-in"
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "{{ jenkins_admin_password }}"
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: "ARGOCD_HOST_URL"
+            value: "{{ argocd_url | default('') }}"
+          - key: "PROMETHEUS_HOST_URL"
+            value: "{{ prometheus_url | default('') }}"
+          - key: "JENKINS_HOST_URL"
+            value: "{{ jenkins_url | default('') }}"
+
+unclassified:
+  location:
+    url: "{{ jenkins_url }}/"
+    adminAddress: "{{ gitlab_username | default('admin') }}@example.com"
+
+  globalLibraries:
+    libraries:
+      - name: "jenkins-shared-library"
+        defaultVersion: "main"
+        implicit: true
+        allowVersionOverride: true
+        includeInChangesets: true
+        retriever:
+          modernSCM:
+            scm:
+              gitSource:
+                remote: "{{ shared_library_repo_url }}"
+                credentialsId: "GITLAB_CREDENTIALS"
+                traits:
+                  - cloneOption:
+                      extension:
+                        shallow: true
+                        noTags: true
+                        honorRefspec: true
+                  - wipeWorkspaceTrait: {}
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - string:
+              scope: GLOBAL
+              id: "GITLAB_PAT_CREDENTIALS"
+              description: "GitLab Personal Access Token for API access"
+              secret: "{{ gitlab_pat | default('') }}"
+          - usernamePassword:
+              scope: GLOBAL
+              id: "GITLAB_CREDENTIALS"
+              description: "GitLab username and token for Git operations"
+              username: "{{ gitlab_username | default('git') }}"
+              password: "{{ gitlab_token | default('') }}"
+          - usernamePassword:
+              scope: GLOBAL
+              id: "ARGOCD_CREDENTIALS"
+              description: "ArgoCD username and password for deployment"
+              username: "{{ argocd_username | default('admin') }}"
+              password: "{{ argocd_password | default('') }}"
+          - string:
+              scope: GLOBAL
+              id: "DISCORD_WEBHOOK_URL"
+              description: "Discord webhook URL for pipeline notifications"
+              secret: "{{ discord_webhook_url | default('') }}"

@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{APP_NAME}}-analysis-newman
+spec:
+  args:
+    - name: url
+      value: ""
+    - name: timeout
+      value: "10"
+    - name: count
+      value: "3"
+    - name: failure
+      value: "1"
+    - name: smoke_interval 
+      value: "5s"
+    - name: secretName
+      value: ""
+    - name: configMapName
+      value: "{{APP_NAME}}-smoke-test-config" 
+  metrics:
+    - name: smoke-test
+      interval: "{{args.smoke_interval}}" 
+      count: "{{args.count}}"
+      failureLimit: "{{args.failure}}"
+      provider:
+        job:
+          spec:
+            backoffLimit: 0
+            ttlSecondsAfterFinished: 300
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                  - name: newman-runner
+                    image: postman/newman:alpine
+                    command: ["/bin/sh", "-c"]
+                    args: 
+                      - |
+                        echo "=== Preparing Newman Environment ==="
+                        CMD="newman run /etc/postman/smoke-test.json --insecure"
+
+                        CMD="$CMD --env-var \"BASE_URL={{args.url}}\""
+                        
+                        for ENV_NAME in $(env | cut -d= -f1 | grep -v '^KUBERNETES_\|^HOME\|^PATH\|^PWD\|^HOSTNAME'); do
+                            ENV_VAL=$(printenv "$ENV_NAME")
+                            CMD="$CMD --env-var \"$ENV_NAME=$ENV_VAL\""
+                        done
+                        
+                        echo "Executing: $CMD"
+                        eval $CMD
+                        
+                    envFrom:
+                      - secretRef:
+                          name: "{{args.secretName}}"
+                          optional: true
+                    volumeMounts:
+                      - name: postman-collection
+                        mountPath: /etc/postman
+                volumes:
+                  - name: postman-collection
+                    configMap:
+                      name: "{{args.configMapName}}"

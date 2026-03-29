@@ -1,0 +1,15 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{NAME}}
+spec:
+  scaleTargetRef:
+    apiVersion: {{TARGET_API}}
+    kind: {{TARGET_KIND}}
+    name: {{TARGET_NAME}}
+  minReplicaCount: {{MIN_REPLICAS}}
+  maxReplicaCount: {{MAX_REPLICAS}}
+  pollingInterval: {{POLLING_INTERVAL}}
+  cooldownPeriod: {{COOLDOWN_PERIOD}}
+  triggers:
+{{TRIGGERS_BLOCK}}

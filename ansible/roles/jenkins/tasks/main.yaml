@@ -1,0 +1,110 @@
+---
+- name: Get Docker GID from host
+  command: "getent group docker"
+  register: docker_group_info
+  changed_when: false
+  ignore_errors: true
+
+- name: Set Docker GID variable
+  set_fact:
+    detected_docker_gid: "{{ docker_group_info.stdout.split(':')[2] | default('999') }}"
+  when: docker_group_info.rc == 0
+
+- name: Create project directory structure
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  loop:
+    - "{{ project_path }}"
+    - "{{ project_path }}/jcasc"
+    - "{{ project_path }}/resources"
+    - "{{ project_path }}/resources/scripts"
+    - "{{ project_path }}/resources/org"
+
+- name: Synchronize project files (Excluding infra templates)
+  synchronize:
+    src: "{{ playbook_dir }}/../"
+    dest: "{{ project_path }}/"
+    delete: yes
+    recursive: yes
+    rsync_opts:
+      - "--exclude=.git"
+      - "--exclude=ansible"
+      - "--exclude=jcasc/jenkins.yaml.j2"
+      - "--exclude=jcasc/jenkins.yaml"
+      - "--exclude=Dockerfile"
+      - "--exclude=docker-compose.yaml"
+  become: false
+
+- name: Render Jenkins JCasC Configuration from Template
+  template:
+    src: ../../../jcasc/jenkins.yaml.j2
+    dest: "{{ project_path }}/jcasc/jenkins.yaml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Ensure correct ownership for Jenkins access (Recursive)
+  file:
+    path: "{{ project_path }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+    recurse: yes
+
+- name: Render Dockerfile from Template
+  template:
+    src: Dockerfile.j2
+    dest: "{{ project_path }}/Dockerfile"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  vars:
+    docker_gid: "{{ detected_docker_gid | default('999') }}"
+
+- name: Render Docker Compose Configuration from Template
+  template:
+    src: docker-compose.yaml.j2
+    dest: "{{ project_path }}/docker-compose.yaml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  vars:
+    docker_gid: "{{ detected_docker_gid | default('999') }}"
+
+- name: Build Jenkins image
+  command:
+    cmd: docker compose -f docker-compose.yaml build
+    chdir: "{{ project_path }}"
+  become: true
+  register: build_output
+
+- name: Start Jenkins
+  command:
+    cmd: docker compose -f docker-compose.yaml up -d --force-recreate
+    chdir: "{{ project_path }}"
+  become: true
+  register: compose_output
+
+- name: Show Docker Compose Output (Build/Start)
+  debug:
+    msg: "{{ compose_output.stdout_lines | default([]) + compose_output.stderr_lines | default([]) }}"
+
+- name: Wait a few seconds for Jenkins to initialize
+  pause:
+    seconds: 5
+
+- name: Get Jenkins Container Logs
+  command:
+    cmd: docker compose -f docker-compose.yaml logs --tail=50
+    chdir: "{{ project_path }}"
+  become: true
+  register: jenkins_logs
+
+- name: Display Jenkins Startup Logs
+  debug:
+    var: jenkins_logs.stdout_lines

@@ -1,0 +1,92 @@
+---
+- name: Create apt keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  when: ansible_distribution == "Ubuntu"
+
+- name: Check if Docker GPG Key already exists
+  stat:
+    path: /etc/apt/keyrings/docker.asc
+  register: docker_key_file
+  when: ansible_distribution == "Ubuntu"
+
+- name: Download Docker GPG Key
+  get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - not docker_key_file.stat.exists
+  ignore_errors: true
+
+- name: AGGRESSIVE CLEANUP - Remove any existing docker repo entries from all sources
+  shell: |
+    # Remove any line containing download.docker.com from the main sources.list
+    sed -i '/download.docker.com/d' /etc/apt/sources.list
+    # Remove any files in sources.list.d that contain download.docker.com
+    grep -l "download.docker.com" /etc/apt/sources.list.d/* | xargs rm -f || true
+  become: true
+  when: ansible_distribution == "Ubuntu"
+  ignore_errors: true
+
+- name: Add Docker Repository with Signed-By (New & Clean)
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+    filename: docker
+  when: ansible_distribution == "Ubuntu"
+
+- name: Update apt cache after clean injection
+  apt:
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Docker Engine
+  package:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: present
+
+- name: Create /etc/docker directory
+  file:
+    path: /etc/docker
+    state: directory
+    mode: '0755'
+
+- name: Configure Docker daemon.json with Hybrid DNS
+  copy:
+    dest: /etc/docker/daemon.json
+    content: |
+      {
+        "dns": {{ (internal_dns_servers + public_dns_servers) | to_json }}
+      }
+    mode: '0644'
+  register: docker_config
+
+- name: Restart Docker service if config changed
+  systemd:
+    name: docker
+    state: restarted
+  when: docker_config.changed
+
+- name: Ensure docker group exists with correct GID
+  group:
+    name: docker
+    gid: "{{ docker_gid }}"
+    state: present
+  register: docker_group_result
+  failed_when: 
+    - docker_group_result.failed
+    - "'already exists' not in docker_group_result.msg | default('')"
+
+- name: Add current user to docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes

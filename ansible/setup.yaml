@@ -1,0 +1,84 @@
+---
+- name: Setup Jenkins Server for Shared Library
+  hosts: jenkins_servers
+  become: true
+  
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install required system packages
+      package:
+        name:
+          - curl
+          - git
+          - ca-certificates
+          - gnupg
+          - lsb-release
+          - python3-pip
+          - python3-venv
+        state: present
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        state: present
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Install Docker Engine
+      package:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+
+    - name: Ensure docker group exists with correct GID
+      group:
+        name: docker
+        gid: "{{ docker_gid }}"
+        state: present
+
+    - name: Add current user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Create project directory
+      file:
+        path: "{{ project_path }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Copy project files (using synchronise or git)
+      # This assumes you have the files locally.
+      # For a real setup, you might use 'git' module to pull from a repo.
+      copy:
+        src: ../
+        dest: "{{ project_path }}/"
+        mode: '0644'
+      # Skip large/unnecessary directories
+      # (Ideally use git or synchronize for better performance)
+
+    - name: Build and Start Jenkins with Docker Compose
+      command:
+        cmd: docker compose up -d --build
+        chdir: "{{ project_path }}"
+      become: false # Run as current user (who is now in docker group)
+      register: compose_output
+
+    - name: Show Docker Compose output
+      debug:
+        var: compose_output.stdout_lines

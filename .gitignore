@@ -1,0 +1,24 @@
+.qodo
+.git
+**/.DS_Store
+.DS_Store
+.env
+
+
+__pycache__/
+*.pyc
+venv/
+.env
+.DS_Store
+*.yaml
+.config.yaml
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.pem
+
+# OS
+.DS_Store
+

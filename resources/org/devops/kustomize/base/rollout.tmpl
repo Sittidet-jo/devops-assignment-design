@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{DEPLOY_NAME}}
+spec:
+  revisionHistoryLimit: 2
+  replicas: {{REPLICAS}}
+  selector:
+    matchLabels:
+      app: {{APP_NAME}}
+
+  template:
+    metadata:
+      labels:
+        app: {{APP_NAME}}
+    spec:
+      imagePullSecrets:
+        - name: {{IMAGE_PULL}}
+      containers:
+        - name: {{APP_NAME}}
+          image: {{APP_NAME}}:PLACEHOLDER_TAG
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{CON_PORT}}
+
+  strategy:
+    canary:
+      stableService: {{STABLE_SVC}}
+      canaryService: {{CANARY_SVC}}
+      steps:
+{{STEPS_BLOCK}}

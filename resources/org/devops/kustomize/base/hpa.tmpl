@@ -1,0 +1,24 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{NAME}}
+spec:
+  scaleTargetRef:
+    apiVersion: {{TARGET_API}}
+    kind: {{TARGET_KIND}}
+    name: {{TARGET_NAME}}
+  minReplicas: {{MIN_REPLICAS}}
+  maxReplicas: {{MAX_REPLICAS}}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{CPU_PERCENT}}
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: {{MEM_PERCENT}}
